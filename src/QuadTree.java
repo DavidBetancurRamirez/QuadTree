@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -86,9 +87,9 @@ public class QuadTree {
 		// Se recorre la imagen cada cantidad de pixeles (this.pixeles)
 		// Para cuando se pasa del alto o ancho que se le pasa
 		// O cuando algun pixel no coincide con el primero obtenido
-		while(fila < alto[1] && !interrupcion) {
+		while(fila <= alto[1] && !interrupcion) {
 			columna = ancho[0];
-			while(columna < ancho[1] && !interrupcion) {
+			while(columna <= ancho[1] && !interrupcion) {
 				if(image.getRGB(columna, fila) != pixel) {
 					interrupcion = true;
 					fila-=this.pixeles; 
@@ -120,12 +121,46 @@ public class QuadTree {
 			compresion(image, new int[] {mitadAlto + 1, alto[1]}, new int[] {ancho[0], mitadAncho}, actual.getHijo(3));
 		}
 	}
+	
+	public BufferedImage reconstruir() throws EInfo {
+		BufferedImage image = new BufferedImage(this.anchoOriginal, this.altoOriginal, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics = image.createGraphics();
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, this.anchoOriginal, this.altoOriginal);
+
+		reconstruir(this.raiz, graphics, 0, 0, this.anchoOriginal, this.altoOriginal);
+
+		graphics.dispose();
+		return image;
+	}
+
+	private void reconstruir(Nodo node, Graphics2D graphics, int x, int y, int width, int height) throws EInfo {
+		if (node != null) {
+			if (node.getHijos() == null) {
+				graphics.setColor(node.getInfo());
+				graphics.fillRect(x, y, width, height);
+			} else {
+				int halfWidth = width / 2;
+				int halfHeight = height / 2;
+	
+				// NO
+				reconstruir(node.getHijo(0), graphics, x, y, halfWidth, halfHeight);
+				// NE
+				reconstruir(node.getHijo(1), graphics, x + halfWidth, y, width - halfWidth, halfHeight);
+				// SE
+				reconstruir(node.getHijo(2), graphics, x + halfWidth, y + halfHeight, width - halfWidth, height - halfHeight);
+				// SO
+				reconstruir(node.getHijo(3), graphics, x, y + halfHeight, halfWidth, height - halfHeight);
+			}
+		}
+	}
 
 	public static void main(String[] args) {
 		try {
-			File archivo_imagen = new File("src\\Imagenes\\ejm7.png");
-			QuadTree a = new QuadTree(archivo_imagen,5);
-			System.out.println(a);
+			File archivo_imagen = new File("src\\Imagenes\\ejm5.png");
+			QuadTree a = new QuadTree(archivo_imagen);
+			BufferedImage i = a.reconstruir();
+			ImageIO.write(i, "png", new File("src\\Imagenes\\Reconstruccion.png"));
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
