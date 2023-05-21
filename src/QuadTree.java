@@ -32,7 +32,7 @@ public class QuadTree {
 			compresion(image);
 		} catch (IOException e) {
 			System.out.println("No existe el archivo con dirección: " + imagejpg);
-		} catch (Exception e) {
+		} catch (EInfo e) {
 			System.out.println(e.getMessage());
 		}
 	}
@@ -86,9 +86,9 @@ public class QuadTree {
 		// Se recorre la imagen cada cantidad de pixeles (this.pixeles)
 		// Para cuando se pasa del alto o ancho que se le pasa
 		// O cuando algun pixel no coincide con el primero obtenido
-		while(fila <= alto[1] && !interrupcion) {
+		while(fila < alto[1] && !interrupcion) {
 			columna = ancho[0];
-			while(columna <= ancho[1] && !interrupcion) {
+			while(columna < ancho[1] && !interrupcion) {
 				if(image.getRGB(columna, fila) != pixel) {
 					interrupcion = true;
 					fila-=this.pixeles; 
@@ -123,8 +123,8 @@ public class QuadTree {
 
 	public static void main(String[] args) {
 		try {
-			File archivo_imagen = new File("src\\Imagenes\\ejm10.png");
-			QuadTree a = new QuadTree(archivo_imagen);
+			File archivo_imagen = new File("src\\Imagenes\\ejm7.png");
+			QuadTree a = new QuadTree(archivo_imagen,5);
 			System.out.println(a);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
