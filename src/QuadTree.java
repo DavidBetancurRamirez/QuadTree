@@ -162,7 +162,7 @@ public class QuadTree {
 	}
 
 	public static void main(String[] args) {
-		File archivo_imagen = new File("C:\\Users\\David\\eclipse-workspace\\QuadTree\\src\\Imagenes\\Ejemplo2.png");
+		File archivo_imagen = new File("C:\\Users\\David\\eclipse-workspace\\QuadTree\\src\\Imagenes\\ejm5.jpg");
 		QuadTree a = new QuadTree(archivo_imagen);
 		try {
 			a.reconstruccion();

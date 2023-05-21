@@ -7,9 +7,15 @@ class EInfo extends Exception{
 }
 
 public class Nodo {
-	private int info; //1 = blanco, -1 = negro y 0 = null (para cuando no tenga valor sino que tenga hijos)
+	private int info;
 	private Nodo padre;
 	private Nodo[] hijos;
+	/*
+	 * [0] = NO 	(noroeste)
+	 * [1] = NE 	(noreste)
+	 * [2] = SE		(sureste)
+	 * [3] = SO		(suroeste)
+	 */
 
     public Nodo() {
 		this.info = 0;
