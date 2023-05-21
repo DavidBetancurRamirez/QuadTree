@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 class EInfo extends Exception{
 	private static final long serialVersionUID = 1L;
 
@@ -7,7 +9,7 @@ class EInfo extends Exception{
 }
 
 public class Nodo {
-	private int info;
+	private Color info;
 	private Nodo padre;
 	private Nodo[] hijos;
 	/*
@@ -18,15 +20,14 @@ public class Nodo {
 	 */
 
     public Nodo() {
-		this.info = 0;
+		this.info = null;
         this.hijos= null;
 	}
 	
-	public int getInfo() {
+	public Color getInfo() {
 		return this.info;
 	}
-	public void setInfo(int info) throws EInfo {
-        if (info!=-1 && info!=1) throw new EInfo("Dato invalido");
+	public void setInfo(Color info) throws EInfo {
 		this.info = info;
 	}
 	
@@ -41,7 +42,7 @@ public class Nodo {
         return this.hijos;
     }
     public Nodo getHijo(int index) throws EInfo {
-        if (0>index || index>4) throw new EInfo("Dato invalido");
+        if (index<0 || index>4) throw new EInfo("Dato invalido");
         return this.hijos[index];
     }
 
