@@ -1,3 +1,5 @@
+package quadTree;
+
 import java.awt.Color;
 
 class EInfo extends Exception{
