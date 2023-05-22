@@ -49,6 +49,7 @@ public class Interfaz extends JFrame {
 	private JPanel contentPane;
 	private JTextField cantidadPxBox;
 	private QuadTree qt;
+	private String ruta = "";
 
 	/**
 	 * Launch the application.
@@ -100,7 +101,7 @@ public class Interfaz extends JFrame {
 
 		JLabel cantidadPx = new JLabel("Cantidad de píxeles");
 		cantidadPx.setFont(new Font("Times New Roman", Font.BOLD, 13));
-		cantidadPx.setBounds(380, 10, 120, 15);
+		cantidadPx.setBounds(640, 10, 120, 15);
 		contentPane.add(cantidadPx);
 
 		cantidadPxBox = new JTextField();
@@ -115,7 +116,7 @@ public class Interfaz extends JFrame {
 			}
 		});
 		cantidadPxBox.setBackground(new Color(255, 222, 173));
-		cantidadPxBox.setBounds(380, 35, 120, 25);
+		cantidadPxBox.setBounds(640, 35, 120, 25);
 		contentPane.add(cantidadPxBox);
 		cantidadPxBox.setColumns(10);
 
@@ -126,9 +127,10 @@ public class Interfaz extends JFrame {
 		JButton uploadButton = new JButton("Cargar imagen");
 		uploadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String ruta = "";
 				JFileChooser fileChooser = new JFileChooser();
-				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG", "png");
+				File defaultDirectory = new File ("src\\Imagenes");
+				fileChooser.setCurrentDirectory(defaultDirectory);
+				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG & JPG", "png", "jpg");
 				fileChooser.setFileFilter(filtro);
 
 				int result = fileChooser.showOpenDialog(Interfaz.this);
@@ -136,17 +138,11 @@ public class Interfaz extends JFrame {
 					ruta = fileChooser.getSelectedFile().getPath();
 					
 					Image img = new ImageIcon(ruta).getImage();
-					File archivo = new File (ruta);
+					
 					
 					int width = img.getWidth(uploadImage); 
 					int height = img.getHeight(uploadImage);
-					
-					if (cantidadPxBox.getText().length() != 0) {
-						int px = Integer.parseInt(cantidadPxBox.getText());
-						qt = new QuadTree (archivo, px);
-					} else {
-						qt = new QuadTree (archivo);
-					}
+
 					
 					height *= validate(width);
 					width *= validate(width);
@@ -168,6 +164,21 @@ public class Interfaz extends JFrame {
 		JButton convertButton = new JButton("Convertir");
 		convertButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				File archivo = new File (ruta);
+				
+				try {
+					if (cantidadPxBox.getText().length() != 0) {
+						int px = Integer.parseInt(cantidadPxBox.getText());
+						qt = new QuadTree (archivo, px);
+					} else {
+						qt = new QuadTree (archivo);
+					}
+				}catch (Exception m) {
+					uploadImage.setIcon(null);
+					JOptionPane.showMessageDialog(null, "Cantidad de px inválidas, por favor ingrese otra cantidad");
+					return;
+				}
+			
 				if (qt == null) {
 					JOptionPane.showMessageDialog(null, "Se debe de seleccionar una imagen primero");
 					return;
@@ -183,6 +194,8 @@ public class Interfaz extends JFrame {
 				}
 				
 				JFileChooser fileChooser = new JFileChooser();
+				File defaultDirectory = new File ("src\\Imagenes");
+				fileChooser.setCurrentDirectory(defaultDirectory);
 				int result = fileChooser.showOpenDialog(Interfaz.this);
 
 				File n = new File("src\\Imagenes\\Reconstruccion.png");
@@ -216,7 +229,7 @@ public class Interfaz extends JFrame {
 
 			}
 		});
-		convertButton.setBounds(220, 35, 120, 30);
+		convertButton.setBounds(800, 35, 120, 30);
 		convertButton.setBackground(new Color(255, 180, 126));
 		contentPane.add(convertButton);
 
