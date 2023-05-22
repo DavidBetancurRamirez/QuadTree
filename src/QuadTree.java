@@ -1,5 +1,7 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -81,9 +83,9 @@ public class QuadTree {
 		// Se recorre la imagen cada (this.pixeles) de pixeles
 		// Se detiene cuando se excede el alto o ancho
 		// O cuando algun pixel no coincide con el primero obtenido
-		while(fila <= alto[1] && !interrupcion) {
+		while(fila < alto[1] && !interrupcion) {
 			columna = ancho[0];
-			while(columna <= ancho[1] && !interrupcion) {
+			while(columna < ancho[1] && !interrupcion) {
 				if(image.getRGB(columna, fila) != pixel) {
 					interrupcion = true;
 					fila-=this.pixeles; 
@@ -95,7 +97,7 @@ public class QuadTree {
 		}
 
 		// Si fila y columna salen del margen, todos los pixeles son del mismo color
-		if(fila > alto[1] && columna > ancho[1]) {
+		if(fila >= alto[1] && columna >= ancho[1]) {
 			// Se guarda el color en la hoja
 			actual.setInfo(new Color(pixel));
 		}else {
@@ -123,29 +125,58 @@ public class QuadTree {
 		graphics.fillRect(0, 0, this.anchoOriginal, this.altoOriginal);
 
 		reconstruir(this.raiz, graphics, 0, 0, this.anchoOriginal, this.altoOriginal);
+		drawQuadtreeLines(this.raiz, graphics, 0, 0, this.anchoOriginal, this.altoOriginal);
 
 		graphics.dispose();
 		return image;
 	}
 
-	private void reconstruir(Nodo node, Graphics2D graphics, int x, int y, int width, int height) throws EInfo {
-		if (node != null) {
-			if (node.getHijos() == null) {
-				graphics.setColor(node.getInfo());
+	private void reconstruir(Nodo nodo, Graphics2D graphics, int x, int y, int width, int height) throws EInfo {
+		if (nodo != null) {
+			if (nodo.getHijos() == null) {
+				graphics.setColor(nodo.getInfo());
 				graphics.fillRect(x, y, width, height);
 			} else {
 				int halfWidth = width / 2;
 				int halfHeight = height / 2;
 	
 				// NO
-				reconstruir(node.getHijo(0), graphics, x, y, halfWidth, halfHeight);
+				reconstruir(nodo.getHijo(0), graphics, x, y, halfWidth, halfHeight);
 				// NE
-				reconstruir(node.getHijo(1), graphics, x + halfWidth, y, width - halfWidth, halfHeight);
+				reconstruir(nodo.getHijo(1), graphics, x + halfWidth, y, width - halfWidth, halfHeight);
 				// SE
-				reconstruir(node.getHijo(2), graphics, x + halfWidth, y + halfHeight, width - halfWidth, height - halfHeight);
+				reconstruir(nodo.getHijo(2), graphics, x + halfWidth, y + halfHeight, width - halfWidth, height - halfHeight);
 				// SO
-				reconstruir(node.getHijo(3), graphics, x, y + halfHeight, halfWidth, height - halfHeight);
+				reconstruir(nodo.getHijo(3), graphics, x, y + halfHeight, halfWidth, height - halfHeight);
 			}
+		}
+	}
+	
+	public void drawQuadtreeLines(Nodo nodo, Graphics2D g, int x, int y, int width, int height) throws EInfo {
+	    // Verificar si el nodo actual no es una hoja
+		if (nodo.getHijos() != null) {
+			// Dibujar líneas verticales y horizontales en las divisiones del Quadtree
+		    int midX = x+(width/2);
+		    int midY = y+(height/2);
+		    g.setColor(Color.ORANGE);
+		    Stroke stroke = new BasicStroke(1f);
+		    g.setStroke(stroke);
+		    g.drawLine(midX, y, midX, y + height);
+		    g.setStroke(stroke);
+		    g.drawLine(x, midY, x + width, midY);
+
+		    // Llamar recursivamente al método drawQuadtreeLines para los hijos
+			int halfWidth = width / 2;
+			int halfHeight = height / 2;
+			
+			// NO
+			drawQuadtreeLines(nodo.getHijo(0), g, x, y, halfWidth, halfHeight);
+			// NE
+			drawQuadtreeLines(nodo.getHijo(1), g, x + halfWidth, y, width - halfWidth, halfHeight);
+			// SE
+			drawQuadtreeLines(nodo.getHijo(2), g, x + halfWidth, y + halfHeight, width - halfWidth, height - halfHeight);
+			// SO
+			drawQuadtreeLines(nodo.getHijo(3), g, x, y + halfHeight, halfWidth, height - halfHeight);
 		}
 	}
 }

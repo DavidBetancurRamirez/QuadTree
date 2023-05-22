@@ -251,10 +251,12 @@ public class Interfaz extends JFrame {
 	}
 
 	public int validate(int a) {
-		if (a >= 300)
+		if (a >= 250)
 			return 1;
-		else if (a < 300 && a >= 100)
-			return 3;
+		else if (a < 250 && a >= 160)
+			return 2;
+		else if (a < 160 && a >= 50)
+			return 4;
 		else
 			return 5;
 	}
