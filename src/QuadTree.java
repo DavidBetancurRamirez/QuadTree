@@ -13,20 +13,20 @@ public class QuadTree {
     private Nodo raiz;
     private int anchoOriginal, altoOriginal, pixeles;
 	
-	public QuadTree(File imagejpg){
+	public QuadTree(File imagejpg) throws IOException, IOException, Exception{
 		this.raiz= new Nodo();
 		// Se recorre de a 1 pixel
 		this.pixeles = 1;
 		crear(imagejpg);
 	}
 	
-	public QuadTree(File imagejpg, int pixeles){
+	public QuadTree(File imagejpg, int pixeles) throws IOException, IOException, Exception{
 		this.raiz= new Nodo();
 		this.pixeles = pixeles;
 		crear(imagejpg);
 	}
 	
-	private void crear(File imagejpg) {
+	private void crear(File imagejpg) throws IOException, IOException, Exception{
 		try {
 			BufferedImage image = null;
 			image= ImageIO.read(imagejpg);
