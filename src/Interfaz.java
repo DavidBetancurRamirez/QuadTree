@@ -1,16 +1,11 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -20,24 +15,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.awt.Window.Type;
 import java.awt.Component;
-import java.awt.Dimension;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
-import java.awt.ScrollPane;
-import java.awt.Point;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
@@ -45,10 +29,16 @@ import java.awt.event.KeyEvent;
 
 public class Interfaz extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField cantidadPxBox;
 	private QuadTree qt;
 	private String ruta = "";
+	private final String convertedDirectory = "src\\Imagenes\\Reconstruccion.png";
+	private ImageIcon uploadedImageIcon;
 
 	/**
 	 * Launch the application.
@@ -123,11 +113,17 @@ public class Interfaz extends JFrame {
 		uploadImage.setSize(0, 0);
 		contentPane.add(uploadImage);
 
+		final JLabel convertedImage = new JLabel("");
+		convertedImage.setSize(0, 0);
+		contentPane.add(convertedImage);
+
 		JButton uploadButton = new JButton("Cargar imagen");
+		uploadButton.setBackground(new Color(255, 180, 126));
 		uploadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				convertedImage.setIcon(null);
 				JFileChooser fileChooser = new JFileChooser();
-				File defaultDirectory = new File ("src\\Imagenes");
+				File defaultDirectory = new File("src\\Imagenes");
 				fileChooser.setCurrentDirectory(defaultDirectory);
 				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG", "png");
 				fileChooser.setFileFilter(filtro);
@@ -135,96 +131,117 @@ public class Interfaz extends JFrame {
 				int result = fileChooser.showOpenDialog(Interfaz.this);
 				if (result == JFileChooser.APPROVE_OPTION) {
 					ruta = fileChooser.getSelectedFile().getPath();
-					
+
 					Image img = new ImageIcon(ruta).getImage();
-					
-					
-					int width = img.getWidth(uploadImage); 
+
+					int width = img.getWidth(uploadImage);
 					int height = img.getHeight(uploadImage);
-					
+
 					height *= validate(width);
 					width *= validate(width);
 					uploadImage.setSize(width, height);
-					uploadImage.setLocation(contentPane.getWidth() / 4 - width / 2, contentPane.getHeight() / 2 - height / 2);
+					uploadImage.setLocation(contentPane.getWidth() / 4 - width / 2,
+							contentPane.getHeight() / 2 - height / 2);
 					ImageIcon icon = new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
 					uploadImage.setIcon(icon);
 				}
 			}
 		});
 		uploadButton.setBounds(60, 35, 120, 30);
-		uploadButton.setBackground(new Color(255, 180, 126));
 		contentPane.add(uploadButton);
-
-		final JLabel convertedImage = new JLabel("");
-		convertedImage.setBounds(521, 534, 45, 13);
-		contentPane.add(convertedImage);
 
 		JButton convertButton = new JButton("Convertir");
 		convertButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				File archivo = new File (ruta);
-				
+				File archivo = new File(ruta);
+
 				try {
 					if (cantidadPxBox.getText().length() != 0) {
 						int px = Integer.parseInt(cantidadPxBox.getText());
-						qt = new QuadTree (archivo, px);
+						qt = new QuadTree(archivo, px);
 					} else {
-						qt = new QuadTree (archivo);
+						qt = new QuadTree(archivo);
 					}
-				}catch (Exception m) {
+				} catch (Exception m) {
 					uploadImage.setIcon(null);
 					JOptionPane.showMessageDialog(null, "Cantidad de px inválidas, por favor ingrese otra cantidad");
 					return;
 				}
-			
+
 				if (qt == null) {
 					JOptionPane.showMessageDialog(null, "Se debe de seleccionar una imagen primero");
 					return;
 				}
-				
+
 				try {
 					BufferedImage i = qt.reconstruir();
-					ImageIO.write(i, "png", new File("src\\Imagenes\\Reconstruccion.png"));
-				}catch (EInfo m) {
+					ImageIO.write(i, "png", new File(convertedDirectory));
+				} catch (EInfo m) {
 					JOptionPane.showMessageDialog(null, "Problemas al reconstruir");
 				} catch (IOException e1) {
 					JOptionPane.showMessageDialog(null, "Problemas con la dirección de guardado");
 				}
-				
-				JFileChooser fileChooser = new JFileChooser();
-				File defaultDirectory = new File ("src\\Imagenes");
-				fileChooser.setCurrentDirectory(defaultDirectory);
-				int result = fileChooser.showOpenDialog(Interfaz.this);
 
-				File n = new File("src\\Imagenes\\Reconstruccion.png");
-				if (result == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = fileChooser.getSelectedFile();
-					String filePath = selectedFile.getAbsolutePath();
-					String originalFileExtension = getFileExtension(n.getAbsolutePath());
-					filePath = filePath + "." + originalFileExtension;
-					String ruta = "";
+				boolean archivoValido = false;
+				File selectedFile = null;
+				String filePath = "";
+				
+				while (!archivoValido) {
+					JFileChooser fileChooser = new JFileChooser();
+					File defaultDirectory = new File("src\\Imagenes");
+					fileChooser.setCurrentDirectory(defaultDirectory);
+					int result = fileChooser.showOpenDialog(Interfaz.this);
+					File n = new File(convertedDirectory);
+					if (result == JFileChooser.APPROVE_OPTION) {
+						selectedFile = fileChooser.getSelectedFile();
+						 filePath = selectedFile.getAbsolutePath();
+						String ruta = "";
+					
+					
+							if (selectedFile.exists()) {
+								int existe = JOptionPane.showConfirmDialog(null, "El archivo ya existe. ¿Desea sobrescribirlo?", "Confirmación", JOptionPane.YES_NO_OPTION);
+								if (existe == JOptionPane.NO_OPTION) {
+									JOptionPane.showMessageDialog(null, "Entonces debe de cambiar el nombre del proyecto");
+									continue;
+								}
+							}
+							archivoValido = true;
+		
 					try {
 						Path sourcePath = n.toPath();
 						Path destinationPath = new File(filePath).toPath();
+						Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 						ruta = destinationPath.toString();
-						Files.copy(sourcePath, destinationPath);
 					} catch (IOException e1) {
 						JOptionPane.showMessageDialog(null, "Problemas con la dirección de guardado");
 					}
-					
-					Image img = new ImageIcon(ruta).getImage();
-					
-					int width = img.getWidth(convertedImage); 
-					int height = img.getHeight(convertedImage);
+
+					BufferedImage convertedImg;
+					try {
+					    convertedImg = ImageIO.read(new File(convertedDirectory));
+					} catch (IOException e1) {
+					    JOptionPane.showMessageDialog(null, "Error al leer la imagen convertida");
+					    return;
+					}
+
+					int width = convertedImg.getWidth();
+					int height = convertedImg.getHeight();
 					height *= validate(width);
 					width *= validate(width);
-					
+
 					convertedImage.setSize(width, height);
-					convertedImage.setLocation(contentPane.getWidth()*3/ 4 - width / 2, contentPane.getHeight() / 2 - height / 2);
-					ImageIcon icon = new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
-					convertedImage.setIcon(icon);
+					convertedImage.setLocation(contentPane.getWidth() * 3 / 4 - width / 2,
+					        contentPane.getHeight() / 2 - height / 2);
+					ImageIcon convertedIcon = new ImageIcon(convertedImg.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+					convertedImage.setIcon(convertedIcon);
+
+
+				} else {
+					convertedImage.setIcon(uploadedImageIcon);
+					break;
 				}
 
+			}
 			}
 		});
 		convertButton.setBounds(800, 35, 120, 30);
@@ -240,14 +257,5 @@ public class Interfaz extends JFrame {
 			return 3;
 		else
 			return 5;
-	}
-
-	private String getFileExtension(String filePath) {
-		String extension = "";
-		int dotIndex = filePath.lastIndexOf('.');
-		if (dotIndex > 0 && dotIndex < filePath.length() - 1) {
-			extension = filePath.substring(dotIndex + 1).toLowerCase();
-		}
-		return extension;
 	}
 }
