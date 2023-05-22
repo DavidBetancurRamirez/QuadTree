@@ -11,31 +11,25 @@ public class QuadTree {
     private Nodo raiz;
     private int anchoOriginal, altoOriginal, pixeles;
 	
-	public QuadTree(File imagejpg){
+	public QuadTree(File image) throws IOException, EInfo {
 		this.raiz= new Nodo();
 		// Se recorre de a 1 pixel
 		this.pixeles = 1;
-		crear(imagejpg);
+		crear(image);
 	}
 	
-	public QuadTree(File imagejpg, int pixeles){
+	public QuadTree(File image, int pixeles) throws IOException, EInfo {
 		this.raiz= new Nodo();
 		this.pixeles = pixeles;
-		crear(imagejpg);
+		crear(image);
 	}
 	
-	private void crear(File imagejpg) {
-		try {
-			BufferedImage image = null;
-			image= ImageIO.read(imagejpg);
-			this.altoOriginal= image.getHeight();
-			this.anchoOriginal= image.getWidth();
-			compresion(image);
-		} catch (IOException e) {
-			System.out.println("No existe el archivo con dirección: " + imagejpg);
-		} catch (EInfo e) {
-			System.out.println(e.getMessage());
-		}
+	private void crear(File image) throws IOException, EInfo {
+		BufferedImage imagen = null;
+		imagen= ImageIO.read(image);
+		this.altoOriginal= imagen.getHeight();
+		this.anchoOriginal= imagen.getWidth();
+		compresion(imagen);
 	}
 	
 	public Nodo getRaiz() {
@@ -84,8 +78,8 @@ public class QuadTree {
 		int columna = ancho[0];
 		boolean interrupcion = false;
 		
-		// Se recorre la imagen cada cantidad de pixeles (this.pixeles)
-		// Para cuando se pasa del alto o ancho que se le pasa
+		// Se recorre la imagen cada (this.pixeles) de pixeles
+		// Se detiene cuando se excede el alto o ancho
 		// O cuando algun pixel no coincide con el primero obtenido
 		while(fila <= alto[1] && !interrupcion) {
 			columna = ancho[0];
@@ -157,7 +151,7 @@ public class QuadTree {
 
 	public static void main(String[] args) {
 		try {
-			File archivo_imagen = new File("src\\Imagenes\\ejm5.png");
+			File archivo_imagen = new File("src\\Imagenes\\ejm1.png");
 			QuadTree a = new QuadTree(archivo_imagen);
 			BufferedImage i = a.reconstruir();
 			ImageIO.write(i, "png", new File("src\\Imagenes\\Reconstruccion.png"));
