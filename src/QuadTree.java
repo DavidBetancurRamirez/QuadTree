@@ -150,6 +150,7 @@ public class QuadTree {
 	}
 
 	public static void main(String[] args) {
+		/*
 		try {
 			File archivo_imagen = new File("src\\Imagenes\\ejm1.png");
 			QuadTree a = new QuadTree(archivo_imagen);
@@ -160,5 +161,6 @@ public class QuadTree {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
+		*/
 	}
 }
