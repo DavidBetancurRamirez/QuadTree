@@ -82,7 +82,7 @@ public class Interfaz extends JFrame {
 		contentPane.setLayout(null);
 
 		JButton exitButton = new JButton();
-		ImageIcon icon = new ImageIcon("src\\Imagenes\\closeIcon.png");
+		ImageIcon icon = new ImageIcon("src\\closeIcon.png");
 		Image image = icon.getImage();
 		Image scaledImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH); // Ajusta el tamaño deseado
 		ImageIcon scaledIcon = new ImageIcon(scaledImage);
@@ -129,7 +129,7 @@ public class Interfaz extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				File defaultDirectory = new File ("src\\Imagenes");
 				fileChooser.setCurrentDirectory(defaultDirectory);
-				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG & JPG", "png", "jpg");
+				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG", "png");
 				fileChooser.setFileFilter(filtro);
 
 				int result = fileChooser.showOpenDialog(Interfaz.this);
