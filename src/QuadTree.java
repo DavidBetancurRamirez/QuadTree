@@ -161,7 +161,9 @@ public class QuadTree {
 			QuadTree a = new QuadTree(archivo_imagen);
 			BufferedImage i = a.reconstruir();
 			ImageIO.write(i, "png", new File("src\\Imagenes\\Reconstruccion.png"));
-		} catch (Exception e) {
+		} catch (EInfo e) {
+			System.out.println(e.getMessage());
+		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
 	}
