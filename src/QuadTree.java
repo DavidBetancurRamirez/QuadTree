@@ -12,17 +12,20 @@ public class QuadTree {
 
     private Nodo raiz;
     private int anchoOriginal, altoOriginal, pixeles;
+    private Color color;
 	
-	public QuadTree(File image) throws IOException, EInfo {
+	public QuadTree(File image, Color color) throws IOException, EInfo {
 		this.raiz= new Nodo();
 		// Se recorre de a 1 pixel
 		this.pixeles = 1;
+		this.color = color;
 		crear(image);
 	}
 	
-	public QuadTree(File image, int pixeles) throws IOException, EInfo {
+	public QuadTree(File image, int pixeles, Color color) throws IOException, EInfo {
 		this.raiz= new Nodo();
 		this.pixeles = pixeles;
+		this.color = color;
 		crear(image);
 	}
 	
@@ -158,7 +161,7 @@ public class QuadTree {
 			// Dibujar líneas verticales y horizontales en las divisiones del Quadtree
 		    int midX = x+(width/2);
 		    int midY = y+(height/2);
-		    g.setColor(Color.BLACK);
+		    g.setColor(color);
 		    Stroke stroke = new BasicStroke(1f);
 		    g.setStroke(stroke);
 		    g.drawLine(midX, y, midX, y + height);
