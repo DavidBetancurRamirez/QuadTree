@@ -158,7 +158,7 @@ public class QuadTree {
 			// Dibujar líneas verticales y horizontales en las divisiones del Quadtree
 		    int midX = x+(width/2);
 		    int midY = y+(height/2);
-		    g.setColor(Color.ORANGE);
+		    g.setColor(Color.BLACK);
 		    Stroke stroke = new BasicStroke(1f);
 		    g.setStroke(stroke);
 		    g.drawLine(midX, y, midX, y + height);

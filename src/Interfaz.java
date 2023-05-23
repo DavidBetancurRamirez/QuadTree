@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
