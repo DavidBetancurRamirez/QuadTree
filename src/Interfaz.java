@@ -182,7 +182,6 @@ public class Interfaz extends JFrame {
 						qt = new QuadTree(archivo, px, selectedColor);
 						
 				} catch (Exception m1) {
-					uploadImage.setIcon(null);
 					JOptionPane.showMessageDialog(null, "Cantidad de px inválidas, por favor ingrese otra cantidad");
 					return;
 				}
