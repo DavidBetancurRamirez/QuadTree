@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -21,14 +22,7 @@ import java.awt.image.BufferedImage;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import java.awt.Font;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 public class Interfaz extends JFrame {
 
@@ -37,7 +31,6 @@ public class Interfaz extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField cantidadPxBox;
 	private QuadTree qt;
 	private String ruta = "";
 	private final String convertedDirectory = "src\\Imagenes\\Reconstruccion.png";
@@ -91,43 +84,18 @@ public class Interfaz extends JFrame {
 		exitButton.setBounds(1150, 0, 50, 50);
 		exitButton.setBackground(new Color(255, 180, 126));
 		contentPane.add(exitButton);
-
-		cantidadPxBox = new JTextField();
-		cantidadPxBox.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				if (cantidadPxBox.getText().isEmpty()) {
-		            cantidadPxBox.setText("Cantidad px");
-		            cantidadPxBox.setForeground(Color.GRAY);
-		            cantidadPxBox.setFont(cantidadPxBox.getFont().deriveFont(Font.ITALIC));
-		        }
-			}
-		});
-		cantidadPxBox.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				 cantidadPxBox.setText("");
-		         cantidadPxBox.setForeground(Color.BLACK);
-		         cantidadPxBox.setFont(cantidadPxBox.getFont().deriveFont(Font.PLAIN));
-			}
-		});
-		cantidadPxBox.setForeground(Color.GRAY);
-        cantidadPxBox.setFont(cantidadPxBox.getFont().deriveFont(Font.ITALIC));
-        cantidadPxBox.setText("Cantidad px");
-		cantidadPxBox.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				int key = e.getKeyChar();
-				boolean numero = key >= 48 && key <= 57;
-
-				if (!numero || cantidadPxBox.getText().length() >= 2)
-					e.consume();
-			}
-		});
-		cantidadPxBox.setBackground(new Color(255, 222, 173));
-		cantidadPxBox.setBounds(480, 15, 120, 30);
-		contentPane.add(cantidadPxBox);
-		cantidadPxBox.setColumns(10);
+		
+		
+		final JComboBox <Integer> cantidadPx = new JComboBox<Integer>();
+		cantidadPx.setBounds(550, 15, 50, 30);
+		cantidadPx.setBackground(new Color (255, 180, 126));
+		
+		final JLabel textPx = new JLabel("Seleccione la cantidad de px:");
+		textPx.setFont(new Font("Tahoma", Font.BOLD, 10));
+		textPx.setBounds(380, 15, 200, 30);
+		
+		
+		
 
 		final JLabel uploadImage = new JLabel("");
 		uploadImage.setSize(0, 0);
@@ -146,6 +114,7 @@ public class Interfaz extends JFrame {
 		colorButton.setBounds(640, 15, 120, 30);
 		colorButton.setBackground(new Color(255, 180, 126));
 		contentPane.add(colorButton);
+		
 
 		JButton uploadButton = new JButton("Cargar imagen");
 		uploadButton.setBackground(new Color(255, 180, 126));
@@ -166,11 +135,27 @@ public class Interfaz extends JFrame {
 
 					double width = img.getWidth(uploadImage);
 					double height = img.getHeight(uploadImage);
+				
 					
 					if (width >= height) {
+						int maxValue = (int) width/4;
+						for (int i = 1; i <= maxValue; i++)
+							cantidadPx.addItem(Integer.valueOf(i));
+						contentPane.add(textPx);
+						contentPane.add(cantidadPx);
+
+						
 						height *= validate(width);
 						width *= validate(width);
 					}else if (height > width){
+						int maxValue = (int) height/4;
+						for (int i = 1; i <= maxValue; i++)
+							cantidadPx.addItem(Integer.valueOf(i));
+						contentPane.add(textPx);
+						contentPane.add(cantidadPx);
+						
+
+						
 						width *= validate(height);
 						height *= validate(height);
 					}
@@ -192,16 +177,11 @@ public class Interfaz extends JFrame {
 				File archivo = new File(ruta);
 
 				try {
-					if(cantidadPxBox.getText().compareTo("Cantidad px") == 0)
-						cantidadPxBox.setText("");
-					if (!cantidadPxBox.getText().isEmpty()) {
-						int px = Integer.parseInt(cantidadPxBox.getText());
+						Integer selectedValue = (Integer) cantidadPx.getSelectedItem();
+						int px = selectedValue.intValue();
 						qt = new QuadTree(archivo, px, selectedColor);
-					} else {
-						qt = new QuadTree(archivo, selectedColor);
-					}
-				} catch (Exception m) {
-					uploadImage.setIcon(null);
+						
+				} catch (Exception m1) {
 					JOptionPane.showMessageDialog(null, "Cantidad de px inválidas, por favor ingrese otra cantidad");
 					return;
 				}
@@ -292,7 +272,6 @@ public class Interfaz extends JFrame {
 		convertButton.setBounds(800, 15, 120, 30);
 		convertButton.setBackground(new Color(255, 180, 126));
 		contentPane.add(convertButton);
-		
 		
 
 	}
