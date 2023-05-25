@@ -1,6 +1,7 @@
 import java.awt.Color;
+import java.io.Serializable;
 
-class EInfo extends Exception{
+class EInfo extends Exception{ 
 	private static final long serialVersionUID = 1L;
 
 	public EInfo(String m){
@@ -8,7 +9,11 @@ class EInfo extends Exception{
     }
 }
 
-public class Nodo {
+public class Nodo implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Color info;
 	private Nodo padre;
 	private Nodo[] hijos;
