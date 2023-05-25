@@ -105,10 +105,63 @@ public class Interfaz extends JFrame {
 		imagenReconstruida.setSize(0, 0);
 		contentPane.add(imagenReconstruida);
 
+		JButton uploadButton = new JButton("Cargar imagen");
+		uploadButton.setBackground(new Color(255, 180, 126));
+		uploadButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				convertedImage.setIcon(null);
+				imagenReconstruida.setIcon(null);
+				JFileChooser fileChooser = new JFileChooser();
+				File defaultDirectory = new File("src\\Imagenes");
+				fileChooser.setCurrentDirectory(defaultDirectory);
+				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG", "png");
+				fileChooser.setFileFilter(filtro);
+
+				int result = fileChooser.showOpenDialog(Interfaz.this);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					ruta = fileChooser.getSelectedFile().getPath();
+
+					Image img = new ImageIcon(ruta).getImage();
+
+					double width = img.getWidth(uploadImage);
+					double height = img.getHeight(uploadImage);
+
+					if (width >= height) {
+						int maxValue = (int) width / 4;
+						for (int i = 1; i <= maxValue; i++)
+							cantidadPx.addItem(Integer.valueOf(i));
+						contentPane.add(textPx);
+						contentPane.add(cantidadPx);
+
+						height *= validate(width);
+						width *= validate(width);
+					} else if (height > width) {
+						int maxValue = (int) height / 4;
+						for (int i = 1; i <= maxValue; i++)
+							cantidadPx.addItem(Integer.valueOf(i));
+						contentPane.add(textPx);
+						contentPane.add(cantidadPx);
+
+						width *= validate(height);
+						height *= validate(height);
+					}
+
+					uploadImage.setSize((int) width, (int) height);
+					uploadImage.setLocation(contentPane.getWidth() / 4 - (int) width / 2,
+							contentPane.getHeight() / 2 - (int) height / 2);
+					ImageIcon icon = new ImageIcon(
+							img.getScaledInstance((int) width, (int) height, Image.SCALE_SMOOTH));
+					uploadImage.setIcon(icon);
+				}
+			}
+		});
+		uploadButton.setBounds(60, 15, 120, 30);
+		contentPane.add(uploadButton);
+
 		JButton comprimirButton = new JButton("Comprimir");
 		comprimirButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				uploadImage.setIcon(null);
+				convertedImage.setIcon(null);
 				boolean archivoValido = false;
 				File selectedFile = null;
 				String filePath = "";
@@ -118,6 +171,18 @@ public class Interfaz extends JFrame {
 					File defaultDirectory = new File("src\\Comprimidos");
 					fileChooser.setCurrentDirectory(defaultDirectory);
 					int result = fileChooser.showSaveDialog(Interfaz.this);
+
+					try {
+						Integer selectedValue = (Integer) cantidadPx.getSelectedItem();
+						int px = selectedValue.intValue();
+						File archivo = new File(ruta);
+						qt = new QuadTree(archivo, px);
+					} catch (Exception m1) {
+						JOptionPane.showMessageDialog(null,
+								"Cantidad de px inválidas, por favor ingrese otra cantidad");
+						return;
+					}
+
 					if (result == JFileChooser.APPROVE_OPTION) {
 						selectedFile = fileChooser.getSelectedFile();
 						filePath = selectedFile.getPath();
@@ -138,14 +203,10 @@ public class Interfaz extends JFrame {
 
 						archivoValido = true;
 						try {
-							File archivo = new File(ruta);
-							qt = new QuadTree(archivo); // Supongamos que QuadTree acepta un objeto File en su
-														// constructor
-							qt.subirQuadTree(filePath); // Pasamos la ruta del archivo como argumento
+							qt.subirQuadTree(filePath);
 							JOptionPane.showMessageDialog(null, "Archivo guardado exitosamente");
+							uploadImage.setIcon(null);
 
-						} catch (EInfo e1) {
-							e1.printStackTrace();
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -235,63 +296,11 @@ public class Interfaz extends JFrame {
 		colorButton.setBackground(new Color(255, 180, 126));
 		contentPane.add(colorButton);
 
-		JButton uploadButton = new JButton("Cargar imagen");
-		uploadButton.setBackground(new Color(255, 180, 126));
-		uploadButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				convertedImage.setIcon(null);
-				imagenReconstruida.setIcon(null);
-				JFileChooser fileChooser = new JFileChooser();
-				File defaultDirectory = new File("src\\Imagenes");
-				fileChooser.setCurrentDirectory(defaultDirectory);
-				FileNameExtensionFilter filtro = new FileNameExtensionFilter("PNG", "png");
-				fileChooser.setFileFilter(filtro);
-
-				int result = fileChooser.showOpenDialog(Interfaz.this);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					ruta = fileChooser.getSelectedFile().getPath();
-
-					Image img = new ImageIcon(ruta).getImage();
-
-					double width = img.getWidth(uploadImage);
-					double height = img.getHeight(uploadImage);
-
-					if (width >= height) {
-						int maxValue = (int) width / 4;
-						for (int i = 1; i <= maxValue; i++)
-							cantidadPx.addItem(Integer.valueOf(i));
-						contentPane.add(textPx);
-						contentPane.add(cantidadPx);
-
-						height *= validate(width);
-						width *= validate(width);
-					} else if (height > width) {
-						int maxValue = (int) height / 4;
-						for (int i = 1; i <= maxValue; i++)
-							cantidadPx.addItem(Integer.valueOf(i));
-						contentPane.add(textPx);
-						contentPane.add(cantidadPx);
-
-						width *= validate(height);
-						height *= validate(height);
-					}
-
-					uploadImage.setSize((int) width, (int) height);
-					uploadImage.setLocation(contentPane.getWidth() / 4 - (int) width / 2,
-							contentPane.getHeight() / 2 - (int) height / 2);
-					ImageIcon icon = new ImageIcon(
-							img.getScaledInstance((int) width, (int) height, Image.SCALE_SMOOTH));
-					uploadImage.setIcon(icon);
-				}
-			}
-		});
-		uploadButton.setBounds(60, 15, 120, 30);
-		contentPane.add(uploadButton);
-
 		JButton convertButton = new JButton("Convertir");
 		convertButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				File archivo = new File(ruta);
+				imagenReconstruida.setIcon(null);
 
 				try {
 					Integer selectedValue = (Integer) cantidadPx.getSelectedItem();
@@ -336,7 +345,6 @@ public class Interfaz extends JFrame {
 						if (!filePath.endsWith(".png"))
 							filePath += ".png";
 
-						System.out.println(filePath);
 						if (selectedFile.exists()) {
 							int existe = JOptionPane.showConfirmDialog(null,
 									"El archivo ya existe. ¿Desea sobrescribirlo?", "Confirmación",

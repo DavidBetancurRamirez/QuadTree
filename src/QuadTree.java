@@ -25,9 +25,9 @@ public class QuadTree implements Serializable {
 		crear(image);
 	}
 
-	public QuadTree(File image) throws IOException, EInfo {
+	public QuadTree(File image, int pixeles) throws IOException, EInfo {
 		this.raiz = new Nodo();
-		this.pixeles = 1;
+		this.pixeles = pixeles;
 		crear(image);
 	}
 
