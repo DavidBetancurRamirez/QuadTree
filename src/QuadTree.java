@@ -1,7 +1,6 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,14 +13,6 @@ public class QuadTree {
     private int anchoOriginal, altoOriginal, pixeles;
     private Color color;
 	
-	public QuadTree(File image, Color color) throws IOException, EInfo {
-		this.raiz= new Nodo();
-		// Se recorre de a 1 pixel
-		this.pixeles = 1;
-		this.color = color;
-		crear(image);
-	}
-	
 	public QuadTree(File image, int pixeles, Color color) throws IOException, EInfo {
 		this.raiz= new Nodo();
 		this.pixeles = pixeles;
@@ -30,44 +21,19 @@ public class QuadTree {
 	}
 	
 	private void crear(File image) throws IOException, EInfo {
+		// Cargar la imagen
 		BufferedImage imagen = null;
 		imagen= ImageIO.read(image);
+		// Obtener propiedades importantes
 		this.altoOriginal= imagen.getHeight();
 		this.anchoOriginal= imagen.getWidth();
+		// Pasando imagen a arbol
 		compresion(imagen);
-	}
-	
-	public Nodo getRaiz() {
-		return raiz;
-	}
-	public void setRaiz(Nodo raiz) {
-		this.raiz = raiz;
-	}
-
-	public int getAnchoOriginal() {
-		return anchoOriginal;
-	}
-	public void setAnchoOriginal(int anchoOriginal) {
-		this.anchoOriginal = anchoOriginal;
-	}
-
-	public int getAltoOriginal() {
-		return altoOriginal;
-	}
-	public void setAltoOriginal(int altoOriginal) {
-		this.altoOriginal = altoOriginal;
-	}
-
-	public int getPixeles() {
-		return pixeles;
-	}
-	public void setPixeles(int pixeles) {
-		this.pixeles = pixeles;
 	}
 
 	public void compresion(BufferedImage image) throws EInfo {
-		// Se crean arreglos del alto y el ancho de la imagen
 		/*
+		 * Se crean arreglos del alto y el ancho de la imagen
 		 * [0] = inicio de la imagen
 		 * [1] = fin de la imagen
 		 */
@@ -122,13 +88,19 @@ public class QuadTree {
 	}
 	
 	public BufferedImage reconstruir() throws EInfo {
+		// Crear base de imagen
 		BufferedImage image = new BufferedImage(this.anchoOriginal, this.altoOriginal, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = image.createGraphics();
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, this.anchoOriginal, this.altoOriginal);
 
+		// Se llama reconstruir para pintar la imagen
 		reconstruir(this.raiz, graphics, 0, 0, this.anchoOriginal, this.altoOriginal);
-		drawQuadtreeLines(this.raiz, graphics, 0, 0, this.anchoOriginal, this.altoOriginal);
+		
+		// Hacer la cuadricula en la imagen
+		graphics.setColor(color);
+		graphics.setStroke(new BasicStroke(1f));
+		cuadricula(this.raiz, graphics, 0, 0, this.anchoOriginal, this.altoOriginal);
 
 		graphics.dispose();
 		return image;
@@ -155,31 +127,28 @@ public class QuadTree {
 		}
 	}
 	
-	public void drawQuadtreeLines(Nodo nodo, Graphics2D g, int x, int y, int width, int height) throws EInfo {
+	public void cuadricula(Nodo nodo, Graphics2D g, int x, int y, int width, int height) throws EInfo {
 	    // Verificar si el nodo actual no es una hoja
 		if (nodo.getHijos() != null) {
 			// Dibujar líneas verticales y horizontales en las divisiones del Quadtree
 		    int midX = x+(width/2);
 		    int midY = y+(height/2);
-		    g.setColor(color);
-		    Stroke stroke = new BasicStroke(1f);
-		    g.setStroke(stroke);
+		    
 		    g.drawLine(midX, y, midX, y + height);
-		    g.setStroke(stroke);
 		    g.drawLine(x, midY, x + width, midY);
 
-		    // Llamar recursivamente al método drawQuadtreeLines para los hijos
+		    // Llamar recursivamente al método cuadricula para los hijos
 			int halfWidth = width / 2;
 			int halfHeight = height / 2;
 			
 			// NO
-			drawQuadtreeLines(nodo.getHijo(0), g, x, y, halfWidth, halfHeight);
+			cuadricula(nodo.getHijo(0), g, x, y, halfWidth, halfHeight);
 			// NE
-			drawQuadtreeLines(nodo.getHijo(1), g, x + halfWidth, y, width - halfWidth, halfHeight);
+			cuadricula(nodo.getHijo(1), g, x + halfWidth, y, width - halfWidth, halfHeight);
 			// SE
-			drawQuadtreeLines(nodo.getHijo(2), g, x + halfWidth, y + halfHeight, width - halfWidth, height - halfHeight);
+			cuadricula(nodo.getHijo(2), g, x + halfWidth, y + halfHeight, width - halfWidth, height - halfHeight);
 			// SO
-			drawQuadtreeLines(nodo.getHijo(3), g, x, y + halfHeight, halfWidth, height - halfHeight);
+			cuadricula(nodo.getHijo(3), g, x, y + halfHeight, halfWidth, height - halfHeight);
 		}
 	}
 }

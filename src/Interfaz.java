@@ -225,12 +225,11 @@ public class Interfaz extends JFrame {
 							}
 						}							
 						archivoValido = true;
-		
+					
 					try {
 						Path sourcePath = n.toPath();
 						Path destinationPath = new File(filePath).toPath();
 						Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-						ruta = destinationPath.toString();
 					} catch (IOException e1) {
 						JOptionPane.showMessageDialog(null, "Problemas con la dirección de guardado");
 					}
